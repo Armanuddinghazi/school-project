@@ -15,7 +15,7 @@ const DisclosureAdmin = () => {
     const [tableKey, setTableKey] = useState("general_info");
     const [title, setTitle] = useState("");
     const [columns, setColumns] = useState([]);
-    const [rows, setRows] = useState([]);       
+    const [rows, setRows] = useState([]);
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -25,19 +25,19 @@ const DisclosureAdmin = () => {
             const res = await apiClient.get(`/disclosure/${key}`);
             if (res.data) {
                 setTitle(res.data.title || "");
-                
+
                 // Ensure columns exist
                 const fetchedCols = res.data.columns || [];
                 setColumns(fetchedCols);
 
                 const fetchedRows = res.data.rows || [];
-                
+
                 const validatedRows = fetchedRows.map(r => {
                     const baseCells = Array(fetchedCols.length).fill(null).map(() => ({ text: "", file: "", fileType: "" }));
-                    
-                    if(r.cells) {
+
+                    if (r.cells) {
                         r.cells.forEach((cell, idx) => {
-                            if(idx < baseCells.length) baseCells[idx] = cell;
+                            if (idx < baseCells.length) baseCells[idx] = cell;
                         });
                     }
                     return { cells: baseCells };
@@ -80,11 +80,9 @@ const DisclosureAdmin = () => {
     };
 
     const handleRemoveColumn = (colIndex) => {
-        // 1. Remove column header
         const newCols = columns.filter((_, i) => i !== colIndex);
         setColumns(newCols);
 
-        // 2. Remove the corresponding cell from EVERY row
         const newRows = rows.map(row => ({
             ...row,
             cells: row.cells.filter((_, i) => i !== colIndex)
@@ -103,7 +101,6 @@ const DisclosureAdmin = () => {
     // ===========================
 
     const handleAddRow = () => {
-        // Create a new row with empty cells matching the current column count
         const newRow = {
             cells: Array(columns.length).fill(null).map(() => ({ text: "", file: "", fileType: "" }))
         };
@@ -118,13 +115,12 @@ const DisclosureAdmin = () => {
     // ===========================
     //   CELL DATA HANDLERS
     // ===========================
-    
+
     const handleTextChange = (val, rIndex, cIndex) => {
         const tempRows = [...rows];
-        // Ensure cell exists
-        if(tempRows[rIndex] && tempRows[rIndex].cells[cIndex]) {
-             tempRows[rIndex].cells[cIndex].text = val;
-             setRows(tempRows);
+        if (tempRows[rIndex] && tempRows[rIndex].cells[cIndex]) {
+            tempRows[rIndex].cells[cIndex].text = val;
+            setRows(tempRows);
         }
     };
 
@@ -143,13 +139,25 @@ const DisclosureAdmin = () => {
         ]);
     };
 
+ 
+
+    // Ye function file ko "Save" se pehle hi hata deta hai
+    const handleRemoveFile = (rIndex, cIndex) => {
+        const tempRows = [...rows];
+        tempRows[rIndex].cells[cIndex].file = "";
+        tempRows[rIndex].cells[cIndex].fileType = "";
+        setRows(tempRows);
+
+        setFiles((prev) => prev.filter(f => !(f.rIndex === rIndex && f.cIndex === cIndex)));
+    };
+
     const save = async () => {
         try {
             setLoading(true);
             const fd = new FormData();
             fd.append("data", JSON.stringify({ tableKey, title, columns, rows }));
             files.forEach((f) => fd.append(f.fieldname, f.file));
-            
+
             await apiClient.post("/disclosure", fd);
             toast.success("Table saved successfully");
             setFiles([]);
@@ -224,29 +232,44 @@ const DisclosureAdmin = () => {
                                                     <i className="fa-sharp fa-solid fa-trash"></i> Remove Row
                                                 </button>
                                             </div>
-                                            
+
                                             {/* Render Cells based on Columns */}
                                             {row.cells.map((cell, cIndex) => (
                                                 <div key={cIndex} className="mb-2">
-                                                    <label className="form-label text-muted" style={{fontSize: '12px'}}>
-                                                        {columns[cIndex] || `Column ${cIndex+1}`}
+                                                    <label className="form-label text-muted" style={{ fontSize: '12px' }}>
+                                                        {columns[cIndex] || `Column ${cIndex + 1}`}
                                                     </label>
                                                     <div className="row g-2">
                                                         <div className="col-lg-6">
                                                             <input
-                                                            className="form-control w-100"
-                                                            placeholder="Text Data"
-                                                            value={cell.text}
-                                                            onChange={(e) => handleTextChange(e.target.value, rIndex, cIndex)}
-                                                        />
+                                                                className="form-control w-100"
+                                                                placeholder="Text Data"
+                                                                value={cell.text}
+                                                                onChange={(e) => handleTextChange(e.target.value, rIndex, cIndex)}
+                                                            />
                                                         </div>
                                                         <div className="col-lg-6">
-                                                             <input
+                                                            <input
                                                                 type="file"
                                                                 className="form-control"
                                                                 onChange={(e) => handleFileChange(e.target.files[0], rIndex, cIndex)}
                                                             />
-                                                            {cell.file && <small className="txt-success mb-0">{cell.file}</small>}
+                                                            {/* {cell.file && <small className="txt-success mb-0">{cell.file}</small>} */}
+
+                                                            {cell.file && (
+                                                                <div className="d-flex justify-content-between align-items-center mt-1 p-1 border rounded bg-white">
+                                                                    <small className="text-success text-truncate me-2" title={cell.file}>
+                                                                        <i className="fa-solid fa-paperclip me-1"></i> {cell.file}
+                                                                    </small>
+                                                                    <button
+                                                                        className="btn btn-danger light btn-sm p-0 px-2"
+                                                                        onClick={() => handleRemoveFile(rIndex, cIndex)}
+                                                                        type="button"
+                                                                    >
+                                                                        <i className="fa-solid fa-xmark " style={{ fontSize: '13px' }}></i>
+                                                                    </button>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
