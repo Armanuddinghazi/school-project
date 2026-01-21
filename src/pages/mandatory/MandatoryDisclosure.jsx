@@ -138,7 +138,7 @@ const MandatoryDisclosure = () => {
                         {!loading && tables.length === 0 && (
                             <div className="alert alert-info text-center py-4 shadow-sm" role="alert">
                                 <i className="fa-regular fa-folder-open me-2"></i>
-                                No mandatory disclosure documents found.
+                                No mandatory disclosure documents found. 
                             </div>
                         )}
 
