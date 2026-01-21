@@ -287,6 +287,11 @@ label {
 }
 
 
+/* Custom css code  */
+.text-clr{
+  color: var(--theme-color2);
+}
+
 
 /*====================
 4. Preloader
@@ -7036,6 +7041,12 @@ Skeleton card css
 
   .copyright::before{
     width: 40%;
+  }
+  .application-form{
+    padding: 30px 18px;
+  }
+  .contact-form {
+    padding: 15px;
   }
 }
 

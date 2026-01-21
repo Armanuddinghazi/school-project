@@ -111,7 +111,7 @@ const Header = () => {
 
                             <div className="mobile-menu-right">
                                 <button className="navbar-toggler" type="button" onClick={toggleMobileMenu}>
-                                    <span className="navbar-toggler-mobile-icon"><i class="fa-jelly fa-regular fa-bars"></i></span>
+                                    <span className="navbar-toggler-mobile-icon"><i className="fa-jelly fa-regular fa-bars"></i></span>
                                 </button>
                             </div>
 
@@ -175,7 +175,7 @@ const Header = () => {
                 <div className="sidebar-logo d-flex  justify-content-between align-items-center">
                     <Link to="/" className="navbar-brand">
                         {data.logo ? (
-                            <img src={`${BASE_URL}${data.logo}`} width={50} alt="logo" />
+                            <img src={`${BASE_URL}${data.logo}`} width={60} alt="logo" />
                         ) : <h2>Logo</h2>}
                     </Link>
                     <span className="close-btn-mobile" onClick={closeMenu}><i className="fa-regular fa-x"></i></span>
